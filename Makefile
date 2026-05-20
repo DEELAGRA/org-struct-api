@@ -17,3 +17,5 @@ env-cleanup:
 	else \
 		echo "File deletion canceled"; \
 	fi
+run:
+	@go run cmd/main.go

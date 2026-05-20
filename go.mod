@@ -1,4 +1,4 @@
-module org-struct-api
+module github.com/DEELAGRA/org-struct-api
 
 go 1.26.1
 
