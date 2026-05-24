@@ -21,6 +21,10 @@ type DepartmentService struct {
 	repo repository.DepartmentRepository
 }
 
+func NewDepartmentService(repo repository.DepartmentRepository) *DepartmentService {
+	return &DepartmentService{repo: repo}
+}
+
 func (s *DepartmentService) CreateDepartment(ctx context.Context, name string, parentID *int) (*models.Department, error) {
 	name = strings.TrimSpace(name)
 	if len(name) < 1 || len(name) > 200 {
@@ -166,4 +170,39 @@ func (s *DepartmentService) DeleteDepartment(ctx context.Context, id int, mode s
 	default:
 		return ErrValidation
 	}
+}
+
+func (s *DepartmentService) GetDepartmentTree(ctx context.Context, id int, depth int, includeEmployee bool) (*models.Department, error) {
+	if depth < 1 || depth > 5 {
+		depth = 1
+	}
+	tree, err := s.repo.GetDepartmentTree(ctx, id, depth)
+	if err != nil {
+		return nil, err
+	}
+	if tree == nil {
+		return nil, ErrNotFound
+	}
+
+	if includeEmployee {
+		err = s.populateEmployees(ctx, tree)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return tree, nil
+}
+
+func (s *DepartmentService) populateEmployees(ctx context.Context, dept *models.Department) error {
+	emps, err := s.repo.GetEmployeesByDepartmentID(ctx, dept.ID)
+	if err != nil {
+		return err
+	}
+	dept.Employees = emps
+	for i := range dept.Children {
+		if err := s.populateEmployees(ctx, &dept.Children[i]); err != nil {
+			return err
+		}
+	}
+	return nil
 }

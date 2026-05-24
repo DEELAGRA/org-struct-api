@@ -86,3 +86,40 @@ func (r *departmentRepo) IsDescendant(ctx context.Context, parentId, childID int
 		currentID = *dept.ParentID
 	}
 }
+
+func (r *departmentRepo) GetDepartmentTree(ctx context.Context, rootID int, maxDepth int) (*models.Department, error) {
+	var root models.Department
+	if err := r.db.WithContext(ctx).First(&root, rootID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	if err := r.loadChildren(ctx, &root, 1, maxDepth); err != nil {
+		return nil, err
+	}
+	return &root, nil
+}
+
+func (r *departmentRepo) loadChildren(ctx context.Context, dept *models.Department, currentDepth, maxDepth int) error {
+	if currentDepth > maxDepth {
+		return nil
+	}
+	var children []models.Department
+	if err := r.db.WithContext(ctx).Where("parent_id = ?", dept.ID).Find(&children).Error; err != nil {
+		return err
+	}
+	for i := range children {
+		if err := r.loadChildren(ctx, &children[i], currentDepth+1, maxDepth); err != nil {
+			return err
+		}
+	}
+	dept.Children = children
+	return nil
+}
+
+func (r *departmentRepo) GetEmployeesByDepartmentID(ctx context.Context, deptID int) ([]models.Employee, error) {
+	var emps []models.Employee
+	err := r.db.WithContext(ctx).Where("department_id = ?", deptID).Find(&emps).Error
+	return emps, err
+}
