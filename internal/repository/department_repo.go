@@ -83,6 +83,6 @@ func (r *departmentRepo) IsDescendant(ctx context.Context, parentId, childID int
 		if *dept.ParentID == parentId {
 			return true, nil
 		}
-		currentID = *&dept.Parent.ID
+		currentID = *dept.ParentID
 	}
 }
