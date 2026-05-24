@@ -20,6 +20,7 @@ func NewDepartmentHandler(svc *service.DepartmentService) *DepartmentHandler {
 }
 
 func (h *DepartmentHandler) RegisterRoutes(mux *http.ServeMux) {
+	mux.HandleFunc("/departments", h.departmentsRouter)
 	mux.HandleFunc("/departments/", h.departmentsRouter)
 }
 

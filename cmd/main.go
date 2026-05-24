@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/DEELAGRA/org-struct-api/internal/config"
+	"github.com/DEELAGRA/org-struct-api/internal/middleware"
 	"github.com/DEELAGRA/org-struct-api/internal/repository"
 	"github.com/DEELAGRA/org-struct-api/internal/router"
 	"github.com/DEELAGRA/org-struct-api/internal/service"
@@ -36,9 +37,12 @@ func main() {
 
 	mux := router.SetupRouter(svc)
 
+	var handler http.Handler = mux
+	handler = middleware.Logging(handler)
+
 	addr := ":" + strconv.Itoa(cfg.ServerPort)
 	log.Printf("Сервер запущен на %s", addr)
-	if err := http.ListenAndServe(addr, mux); err != nil {
+	if err := http.ListenAndServe(addr, handler); err != nil {
 		log.Fatalf("Ошибка запуска сервера: %v", err)
 	}
 }

@@ -11,7 +11,7 @@ env-down:
 env-cleanup:
 	@ read -p "Clear all volume environment files? Risk of data loss. [Y/N]: " ans; \
 	if [ "$$ans" = "y" ]; then \
-		docker compose down todoapp-postgres && \
+		docker compose down org-struct-api-postgres && \
 		sudo rm -rf out/pgdata && \
 		echo "Environment files deleted"; \
 	else \
@@ -22,16 +22,10 @@ run:
  
 
 migrate-up:
-	@make migrate-action action=up
+	goose -dir db/migrations postgres $(DATABASE_URL) up
 migrate-down:
-	@make migrate-action action=down
+	goose -dir db/migrations postgres $(DATABASE_URL) down
 
-migrate-action:
-	@if [ -z "$(action)" ]; then \
-		echo "The required parameter 'action' is missing. Example: make migrate-action action=up/down"; \
-		exit 1; \
-	fi; \
-	goose -dir db/migrations postgres $(DATABASE_URL) "$(action)"
 
 migrate-create:
 	@if [ -z "$(seq)" ]; then \
