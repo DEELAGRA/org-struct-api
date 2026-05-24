@@ -18,13 +18,14 @@ type Config struct {
 
 func getEnv(key string) string {
 	val := os.Getenv(key)
+
 	if val == "" {
 		log.Fatal("An empty string was passed")
 	}
 	return val
 }
 
-func getEnvINT(key string) (int, error) {
+func getEnvInt(key string) (int, error) {
 	val := os.Getenv(key)
 	if val == "" {
 		log.Fatal("An empty string was passed")
@@ -32,12 +33,12 @@ func getEnvINT(key string) (int, error) {
 	return strconv.Atoi(val)
 }
 func Load() (*Config, error) {
-	port, err := getEnvINT("SERVER_PORT")
+	port, err := getEnvInt("SERVER_PORT")
 	if err != nil {
 		return nil, err
 	}
 
-	dbPort, err := getEnvINT("DB_PORT")
+	dbPort, err := getEnvInt("DB_PORT")
 	if err != nil {
 		return nil, err
 	}

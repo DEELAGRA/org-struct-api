@@ -5,24 +5,23 @@ import (
 )
 
 type Department struct {
-	ID         int       `gorm:"primaryKey;autoIncrement" json:"id"`
-	Name       string    `gorm:"not null" json:"name"`
-	Parent_id  int       `gorm:"index" json:"parent_id"`
-	Created_at time.Time `gorm:"autoCreateTime" json:"created_at"`
-}
+	ID        int       `gorm:"column:id;primaryKey;autoIncrement"`
+	Name      string    `gorm:"column:name;type:varchar(200);not null"`
+	ParentID  *int      `gorm:"column:parent_id"`
+	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
 
-func (Department) TableName() string {
-	return "department"
+	Parent    *Department  `gorm:"foreignKey:ParentID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT"`
+	Children  []Department `gorm:"foreignKey:ParentID"`
+	Employees []Employee   `gorm:"foreignKey:DepartmentID"`
 }
 
 type Employee struct {
-	ID             int         `json:"id"`
-	Departament_id *Department `json:"departament_id"`
-	Full_name      string      `json:"full_name"`
-	Position       string      `json:"position"`
-	Hired_at       time.Time   `json:"hired_at"`
-}
+	ID           int        `gorm:"column:id;primaryKey;autoIncrement"`
+	DepartmentID int        `gorm:"column:department_id;not null"`
+	FullName     string     `gorm:"column:full_name;type:varchar(200);not null"`
+	Position     string     `gorm:"column:position;type:varchar(200);not null"`
+	HiredAt      *time.Time `gorm:"column:hired_at;type:date"`
+	CreatedAt    time.Time  `gorm:"column:created_at;autoCreateTime"`
 
-func (Employee) TableName() string {
-	return "employee"
+	Department Department `gorm:"foreignKey:DepartmentID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT"`
 }

@@ -1,11 +1,13 @@
 services:
   org-struct-api-postgres:
     image: postgres:18.1-bookworm
+    ports:
+    - "5432:5432"
     container_name: org-struct-api-env-postgres
     environment: 
-    - POSTGRES_USER=${POSTGRES_USER}
-    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    - POSTGRES_DB=${POSTGRES_DB}
+    - POSTGRES_USER=${DB_USER}
+    - POSTGRES_PASSWORD=${DB_PASSWORD}
+    - POSTGRES_DB=${DB_NAME}
     volumes:
     - ${PROJECT_ROOT}/out/pgdata:/var/lib/postgresql
     restart: always
