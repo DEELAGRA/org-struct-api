@@ -1,8 +1,8 @@
 include .env
 export
-
+export DB_USER DB_PASSWORD DB_HOST DB_PORT DB_NAME DB_SSLMODE
 export PROJECT_ROOT=$(shell pwd)
-
+DATABASE_URL ?= "postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSLMODE)"
 
 env-up:
 	@docker compose up -d org-struct-api-postgres
@@ -19,3 +19,24 @@ env-cleanup:
 	fi
 run:
 	@go run cmd/main.go
+ 
+
+migrate-up:
+	@make migrate-action action=up
+migrate-down:
+	@make migrate-action action=down
+
+migrate-action:
+	@if [ -z "$(action)" ]; then \
+		echo "The required parameter 'action' is missing. Example: make migrate-action action=up/down"; \
+		exit 1; \
+	fi; \
+	goose -dir db/migrations postgres $(DATABASE_URL) "$(action)"
+
+migrate-create:
+	@if [ -z "$(seq)" ]; then \
+		echo "The required parameter 'seq' is missing. Example: make migrate-create seq=init"; \
+		exit 1; \
+	fi; \
+	mkdir -p db/migrations; \
+	goose -dir db/migrations create $$seq sql
