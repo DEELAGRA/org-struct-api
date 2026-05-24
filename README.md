@@ -28,7 +28,7 @@ Content-Type: application/json
 
 {
   "name": "IT",
-  "parent_id": null   // опционально
+  "parent_id": null   
 }
 ```
 Ответ: `201 Created` (объект подразделения)
@@ -41,7 +41,7 @@ Content-Type: application/json
 {
   "full_name": "John Doe",
   "position": "Developer",
-  "hired_at": "2025-01-15"   // опционально (YYYY-MM-DD)
+  "hired_at": "2025-01-15"   
 }
 ```
 Ответ: `201 Created` (объект сотрудника)
@@ -58,8 +58,8 @@ PATCH /departments/{id}
 Content-Type: application/json
 
 {
-  "name": "Новое имя",        // опционально
-  "parent_id": 2              // опционально
+  "name": "Новое имя",        
+  "parent_id": 2              
 }
 ```
 Ответ: `200 OK` (обновлённый объект)
